@@ -269,5 +269,9 @@ managed-identity-wallet:
       nameOverride: miw-keycloak-postgres
   livenessProbe:
     initialDelaySeconds: 90
+    failureThreshold: 10
+    periodSeconds: 10
   readinessProbe:
     initialDelaySeconds: 90
+    failureThreshold: 10
+    periodSeconds: 10
