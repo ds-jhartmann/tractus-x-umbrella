@@ -247,7 +247,7 @@ vault:
 
 managed-identity-wallet:
   nameOverride: miw
-  enabled: true
+  enabled: false
   miw:
     database:
       host: "{{ .Release.Name }}-miw-postgres"
@@ -268,10 +268,10 @@ managed-identity-wallet:
     postgresql:
       nameOverride: miw-keycloak-postgres
   livenessProbe:
-    initialDelaySeconds: 90
+    initialDelaySeconds: 120
     failureThreshold: 10
     periodSeconds: 10
   readinessProbe:
-    initialDelaySeconds: 90
+    initialDelaySeconds: 120
     failureThreshold: 10
     periodSeconds: 10
