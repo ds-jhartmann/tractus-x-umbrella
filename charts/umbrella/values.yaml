@@ -247,7 +247,7 @@ vault:
 
 managed-identity-wallet:
   nameOverride: miw
-  enabled: false
+  enabled: true
   miw:
     database:
       host: "{{ .Release.Name }}-miw-postgres"
@@ -262,7 +262,7 @@ managed-identity-wallet:
         size: 1Gi
   keycloak:  # TODO replace with central idp
     nameOverride: miw-keycloak
-    enabled: true
+    enabled: false
     ingress:
       enabled: false
     postgresql:
