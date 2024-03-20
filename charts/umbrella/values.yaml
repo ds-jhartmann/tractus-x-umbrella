@@ -18,11 +18,11 @@
 # #############################################################################
 ---
 portal:
-  enabled: false
+  enabled: true
   replicaCount: 1
 
 centralidp:
-  enabled: false
+  enabled: true
   keycloak:
     nameOverride: "centralidp"
     replicaCount: 1
@@ -31,7 +31,7 @@ centralidp:
       architecture: standalone
 
 sharedidp:
-  enabled: false
+  enabled: true
   keycloak:
     nameOverride: "sharedidp"
     replicaCount: 1
@@ -40,7 +40,7 @@ sharedidp:
       architecture: standalone
 
 bpndiscovery:
-  enabled: false
+  enabled: true
   enablePostgres: true
   bpndiscovery:
     authentication: false
@@ -58,7 +58,7 @@ bpndiscovery:
     nameOverride: "bpndiscovery-postgresql"
 
 discoveryfinder:
-  enabled: false
+  enabled: true
   enablePostgres: true
   discoveryfinder:
     authentication: false
@@ -70,7 +70,7 @@ discoveryfinder:
     nameOverride: "discoveryfinder-postgresql"
 
 sdfactory:
-  enabled: false
+  enabled: true
   secret:
     # -- JWK Set URI
     jwkSetUri: "https://centralidp.example.org/auth/realms/CX-Central/protocol/openid-connect/certs"
@@ -126,17 +126,29 @@ vault:
       enabled: false
 
 managed-identity-wallet:
-  nameOverride: miw
   enabled: true
+  nameOverride: miw
+  fullnameOverride: miw
   miw:
+    authorityWallet:
+      bpn: &authority-bpn "BPNL000000000000"
     database:
       host: "{{ .Release.Name }}-miw-postgres"
       secret: "{{ .Release.Name }}-miw-postgres"
     keycloak:
-      url: "http://{{ .Release.Name }}-miw-keycloak"  # TODO connect to central idp
+      url: "http://miw-keycloak"  # TODO connect to central idp
+      clientId: &miw_client miw_private_client
+  resources:
+    limits:
+      cpu: 500m
+      memory: 500Mi
   postgresql:
     nameOverride: miw-postgres
     primary:
+      resources:
+        limits:
+          cpu: 500m
+          memory: 500Mi
       # livenessProbe:
       #   initialDelaySeconds: 30
       #   failureThreshold: 20
@@ -147,16 +159,31 @@ managed-identity-wallet:
         enabled: false
         size: 1Gi
   keycloak:  # TODO replace with central idp
+    fullnameOverride: miw-keycloak
     nameOverride: miw-keycloak
     enabled: true
+    resources:
+      limits:
+        cpu: 500m
+        memory: 500Mi
     ingress:
       enabled: false
     postgresql:
       nameOverride: miw-keycloak-postgres
       primary:
+        livenessProbe:
+          initialDelaySeconds: 30
+          failureThreshold: 20
+        readinessProbe:
+          initialDelaySeconds: 30
+          failureThreshold: 20
         persistence:
           enabled: false
           size: 1Gi
+        resources:
+          limits:
+            cpu: 500m
+            memory: 500Mi
     livenessProbe:
       initialDelaySeconds: 300
       periodSeconds: 10
