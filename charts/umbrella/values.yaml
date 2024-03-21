@@ -28,13 +28,13 @@ centralidp:
     replicaCount: 1
     resources:
       limits:
-        cpu: 1500m
+        cpu: 2000m
         memory: 1Gi
     livenessProbe:
-      initialDelaySeconds: 30
+      initialDelaySeconds: 200
       failureThreshold: 20
     readinessProbe:
-      initialDelaySeconds: 30
+      initialDelaySeconds: 200
       failureThreshold: 20
     postgresql:
       nameOverride: "centralidp-postgresql"
@@ -47,13 +47,13 @@ sharedidp:
     replicaCount: 1
     resources:
       limits:
-        cpu: 1500m
+        cpu: 2000m
         memory: 1Gi
     livenessProbe:
-      initialDelaySeconds: 30
+      initialDelaySeconds: 200
       failureThreshold: 20
     readinessProbe:
-      initialDelaySeconds: 30
+      initialDelaySeconds: 200
       failureThreshold: 20
     postgresql:
       nameOverride: "sharedidp-postgresql"
