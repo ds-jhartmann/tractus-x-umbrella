@@ -169,51 +169,10 @@ managed-identity-wallet:
         limits:
           cpu: 1000m
           memory: 1Gi
-      # livenessProbe:
-      #   initialDelaySeconds: 30
-      #   failureThreshold: 20
-      # readinessProbe:
-      #   initialDelaySeconds: 30
-      #   failureThreshold: 20
       persistence:
         enabled: false
         size: 1Gi
-  keycloak:  # TODO replace with central idp
-    fullnameOverride: miw-keycloak
-    nameOverride: miw-keycloak
-    enabled: true
-    resources:
-      limits:
-        cpu: 500m
-        memory: 500Mi
-    ingress:
-      enabled: false
-    postgresql:
-      nameOverride: miw-keycloak-postgres
-      primary:
-        livenessProbe:
-          initialDelaySeconds: 30
-          failureThreshold: 20
-        readinessProbe:
-          initialDelaySeconds: 30
-          failureThreshold: 20
-        persistence:
-          enabled: false
-          size: 1Gi
-        resources:
-          limits:
-            cpu: 500m
-            memory: 500Mi
-    livenessProbe:
-      initialDelaySeconds: 300
-      periodSeconds: 10
-      timeoutSeconds: 5
-      failureThreshold: 10
-    readinessProbe:
-      initialDelaySeconds: 30
-      periodSeconds: 10
-      timeoutSeconds: 5
-      failureThreshold: 10
+    enabled: false
   livenessProbe:
     initialDelaySeconds: 120
     failureThreshold: 10
