@@ -26,6 +26,16 @@ centralidp:
   keycloak:
     nameOverride: "centralidp"
     replicaCount: 1
+    resources:
+      limits:
+        cpu: 1500m
+        memory: 1Gi
+    livenessProbe:
+      initialDelaySeconds: 30
+      failureThreshold: 20
+    readinessProbe:
+      initialDelaySeconds: 30
+      failureThreshold: 20
     postgresql:
       nameOverride: "centralidp-postgresql"
       architecture: standalone
@@ -35,6 +45,16 @@ sharedidp:
   keycloak:
     nameOverride: "sharedidp"
     replicaCount: 1
+    resources:
+      limits:
+        cpu: 1500m
+        memory: 1Gi
+    livenessProbe:
+      initialDelaySeconds: 30
+      failureThreshold: 20
+    readinessProbe:
+      initialDelaySeconds: 30
+      failureThreshold: 20
     postgresql:
       nameOverride: "sharedidp-postgresql"
       architecture: standalone
@@ -140,15 +160,15 @@ managed-identity-wallet:
       clientId: &miw_client miw_private_client
   resources:
     limits:
-      cpu: 500m
-      memory: 500Mi
+      cpu: 1000m
+      memory: 1Gi
   postgresql:
     nameOverride: miw-postgres
     primary:
       resources:
         limits:
-          cpu: 500m
-          memory: 500Mi
+          cpu: 1000m
+          memory: 1Gi
       # livenessProbe:
       #   initialDelaySeconds: 30
       #   failureThreshold: 20
