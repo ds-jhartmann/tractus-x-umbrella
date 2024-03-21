@@ -172,6 +172,7 @@ managed-identity-wallet:
       persistence:
         enabled: false
         size: 1Gi
+  keycloak:
     enabled: false
   livenessProbe:
     initialDelaySeconds: 120
