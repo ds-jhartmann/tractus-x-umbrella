@@ -156,19 +156,11 @@ managed-identity-wallet:
       host: "{{ .Release.Name }}-miw-postgres"
       secret: "{{ .Release.Name }}-miw-postgres"
     keycloak:
-      url: "http://miw-keycloak"  # TODO connect to central idp
+      url: "https://centralidp.example.org"  # TODO connect to central idp
       clientId: &miw_client miw_private_client
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 1Gi
   postgresql:
     nameOverride: miw-postgres
     primary:
-      resources:
-        limits:
-          cpu: 1000m
-          memory: 1Gi
       persistence:
         enabled: false
         size: 1Gi
