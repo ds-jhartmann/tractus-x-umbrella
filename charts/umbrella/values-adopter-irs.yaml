@@ -51,13 +51,6 @@ discoveryfinder:
           memory: 256Mi
           cpu: 50m
 
-iatpmock:
-  enabled: true
-  resources:
-    requests:
-      cpu: 50m
-      memory: 128Mi
-
 
 bdrs-server-memory:
   enabled: true
@@ -112,10 +105,3 @@ tx-data-provider:
           requests:
             memory: 256Mi
             cpu: 50m
-
-discovery-mock:
-  enabled: true
-  wiremock:
-    connectorEndpoints: [
-      "http://umbrella-dataprovider-edc-controlplane:8084"
-    ]

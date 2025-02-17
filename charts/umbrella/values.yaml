@@ -1486,6 +1486,3 @@ ssi-dim-wallet-stub:
       port: 8080
   keycloak:
     enabled: false
-
-discovery-mock:
-  enabled: false
