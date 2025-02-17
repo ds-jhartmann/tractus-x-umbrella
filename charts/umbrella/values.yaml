@@ -42,10 +42,16 @@ portal:
     poolApiPath: "/pool/v6"
     portalGateAddress: "http://business-partners.tx.test"
     portalGateApiPath: "/gate/v6"
-  custodianAddress: "http://managed-identity-wallets.tx.test"
+  custodianAddress: "http://ssi-dim-wallet-stub.tx.test"
+  dimWrapper:
+    baseAddress: "http://ssi-dim-wallet-stub.tx.test"
+    apiPath: "/api/dim"
+    tokenAddress: "http://ssi-dim-wallet-stub.tx.test/oauth/token"
+  decentralIdentityManagementAuthAddress: "http://ssi-dim-wallet-stub.tx.test/api/sts"
   sdfactoryAddress: "http://sdfactory.tx.test"
   clearinghouseAddress: "http://validation.tx.test"
-  clearinghouseTokenAddress: "http://keycloak.tx.test/realms/example/protocol/openid-connect/token"
+  clearinghouseTokenAddress: "http://someiam.tx.test/realms/example/protocol/openid-connect/token"
+  issuerComponentAddress: "http://ssi-credential-issuer.tx.test"
   frontend:
     ingress:
       enabled: true
@@ -83,15 +89,16 @@ portal:
                 port: 8080
   backend:
     dotnetEnvironment: "Development"
+    useDimWallet: true
     keycloak:
       central:
         clientId: "sa-cl1-reg-2"
-        clientSecret: "aEoUADDw2aNPa0WAaKGAyKfC80n8sKxJ"
+        clientSecret: "changeme"
         jwtBearerOptions:
           requireHttpsMetadata: "false"
       shared:
         clientId: "sa-cl1-reg-1"
-        clientSecret: "YPA1t6BMQtPtaG3fpH8Sa8Ac6KYbPUM7"
+        clientSecret: "changeme"
     registration:
       logging:
         default: "Debug"
@@ -109,7 +116,7 @@ portal:
         encryptionConfigs:
           index0:
             encryptionKey: "deb8261ec7b89c344f1c5ef5a11606e305f14e0d231b1357d90ad0180c5081d3"
-      issuerdid: "did:web:managed-identity-wallets.tx.test:BPNL00000003CRHK"
+      issuerdid: "did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003CRHK"
       swaggerEnabled: true
     appmarketplace:
       logging:
@@ -126,6 +133,7 @@ portal:
         default: "Debug"
       swaggerEnabled: true
     processesworker:
+      clearinghouseConnectDisabled: true
       logging:
         default: "Debug"
         processesLibrary: "Debug"
@@ -136,7 +144,7 @@ portal:
         offerProvider: "Debug"
       bpdm:
         clientId: &bpdmAdminClientId "sa-cl7-cx-5"
-        clientSecret: &bpdmAdminClientSecret "bWSck103qNJ0jZ1LVtG9mUAlcL7R5RLg"
+        clientSecret: &bpdmAdminClientSecret "changeme"
       # -- no configuration for clearinghouse because it's an external component
       # clientId and clientSecret aren't in the centralidp Keycloak
       # clearinghouse:
@@ -144,17 +152,20 @@ portal:
       #   clientSecret: ""
       custodian:
         clientId: "sa-cl5-custodian-2"
-        clientSecret: "UIqawwoohsvZ6AZOd1llLhnsUTKMWe4D"
+        clientSecret: "changeme"
       sdfactory:
         issuerBpn: "BPNL00000003CRHK"
         clientId: "sa-cl8-cx-1"
-        clientSecret: "clbQOPHcVKY9tUUd068vyf8CrsPZ8BgZ"
+        clientSecret: "changeme"
       offerprovider:
         clientId: "sa-cl2-03"
-        clientSecret: "wyNYzSnyu4iGvj17XgLSl0aQxAPjTjmI"
+        clientSecret: "changeme"
       dim:
-        clientId: "dim-client-id"
-        clientSecret: ""
+        clientId: "sa-cl2-05"
+        clientSecret: "changeme"
+        grantType: "client_credentials"
+        scope: "openid"
+        baseAddress: "http://ssi-dim-wallet-stub.tx.test"
         universalResolverAddress: "https://dev.uniresolver.io/"
         encryptionConfigs:
           index0:
@@ -162,7 +173,7 @@ portal:
               "6cbaf47ee30c778088e6faa44e2f0eed98beda86db06c7d2e37e32ab78e14b33"
       issuerComponent:
         clientId: "sa-cl2-04"
-        clientSecret: "c0gFPfWWUpeOr7MP6DIqdRPhUfaX4GRC"
+        clientSecret: "changeme"
         encryptionConfigs:
           index0:
             encryptionKey:
@@ -197,6 +208,93 @@ portal:
       senderEmail: "smtp@tx.test"
       password: ""
     portalmigrations:
+      seeding:
+        seedTestData:
+          enabled: true
+          useOwnConfigMap:
+            configMap: "portal-testdata"
+            filename: "test"
+            companies:
+              # BPN is retrieved from participant id of the dataconsumerOne
+              dataconsumerOne:
+                name: "BPN_OEM_C"
+                connectorUrl: "http://dataconsumer-1-controlplane.tx.test/api/v1/dsp"
+                connectorName: "BPN OEM C Connector"
+              # BPN is retrieved from participant id of the tx-data-provider
+              tx-data-provider:
+                name: "BPN_OEM_A"
+                connectorUrl: "http://dataprovider-controlplane.tx.test/api/v1/dsp"
+                connectorName: "BPN OEM A Connector"
+              # BPN is retrieved from participant id of the dataconsumerTwo
+              dataconsumerTwo:
+                name: "BPN_OEM_B"
+                connectorUrl: "http://dataconsumer-2-controlplane.tx.test/api/v1/dsp"
+                connectorName: "BPN OEM B Connector"
+              company4:
+                name: "BPN_IRS_TEST"
+                bpn: "BPNL00000003AWSS"
+                connectorUrl: "http://company4-controlplane.tx.test/api/v1/dsp"
+                connectorName: "BPN IRS TEST Connector"
+              company5:
+                name: "BPN_N_TIER_A"
+                bpn: "BPNL00000003B0Q0"
+                connectorUrl: "http://company5-controlplane.tx.test/api/v1/dsp"
+                connectorName: "BPN N TIER A Connector"
+              company6:
+                name: "BPN_TRACEX_A_SITE_A"
+                bpn: "BPNS0000000008ZZ"
+                connectorUrl: "http://company6-controlplane.tx.test/api/v1/dsp"
+                connectorName: "BPN TRACEX A SITE A Connector"
+              company7:
+                name: "BPN_TRACEX_B"
+                bpn: "BPNL00000003CNKC"
+                connectorUrl: "http://company7-controlplane.tx.test/api/v1/dsp"
+                connectorName: "BPN TRACEX B Connector"
+              company8:
+                name: "BPN_DISMANTLER"
+                bpn: "BPNL00000003B6LU"
+                connectorUrl: "http://company8-controlplane.tx.test/api/v1/dsp"
+                connectorName: "BPN DISMANTLER Connector"
+              company9:
+                name: "BPN_TRACEX_A"
+                bpn: "BPNL00000003CML1"
+                connectorUrl: "http://company9-controlplane.tx.test/api/v1/dsp"
+                connectorName: "BPN TRACEX A Connector"
+              company10:
+                name: "BPN_TRACEX_B_SITE_A"
+                bpn: "BPNS00000008BDFH"
+                connectorUrl: "http://company10-controlplane.tx.test/api/v1/dsp"
+                connectorName: "BPN TRACEX B SITE A Connector"
+              company11:
+                name: "BPN_TIER_A"
+                bpn: "BPNL00000003B2OM"
+                connectorUrl: "http://company11-controlplane.tx.test/api/v1/dsp"
+                connectorName: "BPN TIER A Connector"
+              company12:
+                name: "BPN_TIER_C"
+                bpn: "BPNL00000003CSGV"
+                connectorUrl: "http://company12-controlplane.tx.test/api/v1/dsp"
+                connectorName: "BPN TIER C Connector"
+              company13:
+                name: "BPN_TIER_B"
+                bpn: "BPNL00000003B5MJ"
+                connectorUrl: "http://company13-controlplane.tx.test/api/v1/dsp"
+                connectorName: "BPN TIER B Connector"
+              company14:
+                name: "BPN_SUB_TIER_B"
+                bpn: "BPNL00000003AXS3"
+                connectorUrl: "http://company14-controlplane.tx.test/api/v1/dsp"
+                connectorName: "BPN SUB TIER B Connector"
+              company15:
+                name: "BPN_SUB_TIER_A"
+                bpn: "BPNL00000003B3NX"
+                connectorUrl: "http://company15-controlplane.tx.test/api/v1/dsp"
+                connectorName: "BPN SUB TIER A Connector"
+              company16:
+                name: "BPN_SUB_TIER_C"
+                bpn: "BPNL00000000BJTL"
+                connectorUrl: "http://company16-controlplane.tx.test/api/v1/dsp"
+                connectorName: "BPN SUB TIER C Connector"
       logging:
         default: "Debug"
     provisioning:
@@ -269,90 +367,17 @@ centralidp:
   keycloak:
     nameOverride: "centralidp"
     replicaCount: 1
+    auth:
+      adminPassword: "adminconsolepwcentralidp"
     postgresql:
       nameOverride: "centralidp-postgresql"
+      auth:
+        password: "dbpasswordcentralidp"
+        postgresPassword: "dbpasswordcentralidp"
       architecture: standalone
       primary:
         persistence:
           enabled: false
-    proxy: edge
-    initContainers:
-      - name: realm-import
-        image: docker.io/tractusx/umbrella-init-container:0.1.0-init
-        imagePullPolicy: IfNotPresent
-        command:
-          - sh
-        args:
-          - -c
-          - |
-            echo "Copying realms..."
-            cp -R /import/catenax-central/R2405/realms/* /realms
-        volumeMounts:
-        - name: realms
-          mountPath: "/realms"
-      - name: theme-import
-        image: docker.io/tractusx/portal-iam:v3.0.0
-        imagePullPolicy: IfNotPresent
-        command:
-          - sh
-        args:
-          - -c
-          - |
-            echo "Copying themes..."
-            cp -R /import/themes/catenax-central/* /themes
-        volumeMounts:
-        - name: themes
-          mountPath: "/themes"
-      # uncomment the following line for tls
-      # - name: init-certs
-      #   image: docker.io/bitnami/keycloak:23.0.7-debian-12-r1
-      #   imagePullPolicy: IfNotPresent
-      #   command: ["/bin/bash"]
-      #   args:
-      #     - -ec
-      #     - |-
-      #       keytool -import -file "/certs/tls.crt" \
-      #               -keystore "/opt/bitnami/keycloak/certs/keycloak.truststore.jks" \
-      #               -storepass "${KEYCLOAK_SPI_TRUSTSTORE_PASSWORD}" \
-      #               -noprompt
-      #   env:
-      #     - name: KEYCLOAK_SPI_TRUSTSTORE_PASSWORD
-      #       value: "changeit"
-      #   volumeMounts:
-      #     - name: certificates
-      #       mountPath: /certs
-      #     - name: shared-certs
-      #       mountPath: "/opt/bitnami/keycloak/certs"
-    extraEnvVars:
-      - name: KEYCLOAK_EXTRA_ARGS
-        value: "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=/realms/CX-Central-realm.json -Dkeycloak.migration.strategy=IGNORE_EXISTING"
-      # uncomment the following line for tls
-      # - name: KEYCLOAK_SPI_TRUSTSTORE_FILE
-      #   value: "/opt/bitnami/keycloak/certs/keycloak.truststore.jks"
-      # - name: KEYCLOAK_SPI_TRUSTSTORE_PASSWORD
-      #   value: "changeit"
-    extraVolumes:
-      - name: realms
-        emptyDir: {}
-      - name: themes
-        emptyDir: {}
-      # uncomment the following line for tls
-      # - name: certificates
-      #   secret:
-      #     secretName: root-secret
-      #     defaultMode: 420
-      # - name: shared-certs
-      #   emptyDir: {}
-    extraVolumeMounts:
-      - name: realms
-        mountPath: "/realms"
-      - name: themes
-        mountPath: "/opt/bitnami/keycloak/themes/catenax-central"
-      # uncomment the following line for tls
-      # - name: certificates
-      #   mountPath: /certs
-      # - name: shared-certs
-      #   mountPath: "/opt/bitnami/keycloak/certs"
     ingress:
       enabled: true
       ingressClassName: "nginx"
@@ -369,115 +394,184 @@ centralidp:
         nginx.ingress.kubernetes.io/proxy-buffers-number: "20"
         nginx.ingress.kubernetes.io/use-regex: "true"
       tls: false
-  secrets:
-    postgresql:
-      auth:
-        existingSecret:
-          postgrespassword: "dbpasswordcentralidp"
-          password: "dbpasswordcentralidp"
-          replicationPassword: "dbpasswordcentralidp"
-    auth:
-      existingSecret:
-        # -- Password for the admin username 'admin'. Secret-key 'admin-password'.
-        adminpassword: "adminconsolepwcentralidp"
+    # uncomment the following line for tls
+    # initContainers:
+    #   - name: init-certs
+    #     image: docker.io/bitnami/keycloak:25.0.6-debian-12-r0
+    #     imagePullPolicy: IfNotPresent
+    #     command: ["/bin/bash"]
+    #     args:
+    #       - -ec
+    #       - |-
+    #         keytool -import -file "/certs/tls.crt" \
+    #                 -keystore "/opt/bitnami/keycloak/certs/keycloak.truststore.jks" \
+    #                 -storepass "${KEYCLOAK_SPI_TRUSTSTORE_PASSWORD}" \
+    #                 -noprompt
+    #     env:
+    #       - name: KEYCLOAK_SPI_TRUSTSTORE_PASSWORD
+    #         value: "changeit"
+    #     volumeMounts:
+    #       - name: certificates
+    #         mountPath: /certs
+    #       - name: shared-certs
+    #         mountPath: "/opt/bitnami/keycloak/certs"
+    # extraEnvVars:
+    #   - name: KEYCLOAK_SPI_TRUSTSTORE_FILE
+    #     value: "/opt/bitnami/keycloak/certs/keycloak.truststore.jks"
+    #   - name: KEYCLOAK_SPI_TRUSTSTORE_PASSWORD
+    #     value: "changeit"
+    # extraVolumes:
+    #   - name: certificates
+    #     secret:
+    #       secretName: root-secret
+    #       defaultMode: 420
+    #   - name: shared-certs
+    #     emptyDir: {}
+    # extraVolumeMounts:
+    #   - name: certificates
+    #     mountPath: /certs
+    #   - name: shared-certs
+    #     mountPath: "/opt/bitnami/keycloak/certs"
+  realmSeeding:
+    sslRequired: "none"
+    clients:
+      registration:
+        redirects:
+          - http://portal.tx.test/*
+      portal:
+        rootUrl: http://portal.tx.test/home
+        redirects:
+          - http://portal.tx.test/*
+      semantics:
+        redirects:
+          - http://portal.tx.test/*
+      miw:
+        clientSecret: "changeme"
+        redirects:
+          - http://managed-identity-wallets.tx.test/*
+      bpdm:
+        clientSecret: "changeme"
+        redirects:
+          - http://partners-pool.tx.test/*
+      bpdmGate:
+        clientSecret: "changeme"
+        redirects:
+          - http://partners-gate.tx.test/*
+      bpdmOrchestrator:
+        clientSecret: "changeme"
+    serviceAccounts:
+      clientSecrets:
+        - clientId: "sa-cl1-reg-2"
+          clientSecret: "changeme"
+        - clientId: "sa-cl2-01"
+          clientSecret: "changeme"
+        - clientId: "sa-cl2-02"
+          clientSecret: "changeme"
+        - clientId: "sa-cl2-03"
+          clientSecret: "changeme"
+        - clientId: "sa-cl2-04"
+          clientSecret: "changeme"
+        - clientId: "sa-cl2-05"
+          clientSecret: "changeme"
+        - clientId: "sa-cl3-cx-1"
+          clientSecret: "changeme"
+        - clientId: "sa-cl5-custodian-2"
+          clientSecret: "changeme"
+        - clientId: "sa-cl7-cx-1"
+          clientSecret: "changeme"
+        - clientId: "sa-cl7-cx-5"
+          clientSecret: "changeme"
+        - clientId: "sa-cl7-cx-7"
+          clientSecret: "changeme"
+        - clientId: "sa-cl8-cx-1"
+          clientSecret: "changeme"
+        - clientId: "sa-cl21-01"
+          clientSecret: "changeme"
+        - clientId: "sa-cl22-01"
+          clientSecret: "changeme"
+        - clientId: "sa-cl24-01"
+          clientSecret: "changeme"
+        - clientId: "sa-cl25-cx-1"
+          clientSecret: "changeme"
+        - clientId: "sa-cl25-cx-2"
+          clientSecret: "changeme"
+        - clientId: "sa-cl25-cx-3"
+          clientSecret: "changeme"
+    bpn: "BPNL00000003CRHK"
+    sharedidp: "http://sharedidp.tx.test"
+    # -- test service accounts for EDC - MIW which are obsolete since R24.05;
+    # uncomment once EDC uses SSI DIM Wallet Stub and the helm chart testing has been updated;
+    # currently the post-install testdata-upload-job fails if not available
+    extraServiceAccounts:
+      clientSecretsAndBpn:
+        - clientId: satest01
+          clientSecret: UbfW4CR1xH4OskkovqJ2JzcwnQIrG7oj
+          bpn: BPNL00000003AZQP
+        - clientId: satest02
+          clientSecret: pyFUZP2L9UCSVJUScHcN3ZEgy2PGyEpg
+          bpn: BPNL00000003AYRE
+        - clientId: satest03
+          clientSecret: tPwy4exxH1sXBRQouobSA2nNVaaPuwCs
+          bpn: BPNL00000003AVTH
+        - clientId: satest04
+          clientSecret: BxZ3cwYUPJKK7gI4wq7q6Hgoxel6MphF
+          bpn: BPNL00000003AWSS
+        - clientId: satest05
+          clientSecret: dR00GN1AWCYbRGbZY8TXjs2YEPMeCxLF
+          bpn: BPNL00000003B0Q0
+        - clientId: satest06
+          clientSecret: pDSziT0TUFAkMx0qGFcvpE4XkMqPh13v
+          bpn: BPNS0000000008ZZ
+        - clientId: satest07
+          clientSecret: GY5a44sNuNIjrTyjHvdEPLeNRHH0Kt39
+          bpn: BPNL00000003CNKC
+        - clientId: satest08
+          clientSecret: WUXpQx1aIclA7enqtk4o2uvLDLMreUMI
+          bpn: BPNL00000003B6LU
+        - clientId: satest09
+          clientSecret: N08TGNdhUskJcmVEnOh1tAGwr9oca9PU
+          bpn: BPNL00000003CML1
+        - clientId: satest10
+          clientSecret: gzdSG0CBDJrtv1gje0zUASu1S9P4I7xP
+          bpn: BPNS00000008BDFH
+        - clientId: satest11
+          clientSecret: CC3fz3dQGZsBp2NCbowOV65efBFZTgEO
+          bpn: BPNL00000003B2OM
+        - clientId: satest12
+          clientSecret: 2gjSlFxBO7spEM4aTz3f8CqDS0klbt7C
+          bpn: BPNL00000003CSGV
+        - clientId: satest13
+          clientSecret: 3YQzDqEsdUZ83DVHSIRYUCK4pot61r5M
+          bpn: BPNL00000003B5MJ
+        - clientId: satest14
+          clientSecret: 7qtMpfN3otq5dGiEPssVongXK56lb9LE
+          bpn: BPNL00000003AXS3
+        - clientId: satest15
+          clientSecret: 8QiZ8ineW0Lt8ZOlC2MYuCR0TvM6vMYX
+          bpn: BPNL00000003B3NX
+        - clientId: satest16
+          clientSecret: d2sqUurBH9Vd8DNRmjiMfObU67ajorCq
+          bpn: BPNL00000000BJTL
+    initContainer:
+      image:
+        name: docker.io/tractusx/umbrella-init-container:2.0.0-init
+        pullPolicy: IfNotPresent
 
 sharedidp:
   enabled: false
   keycloak:
     nameOverride: "sharedidp"
-    replicaCount: 1
+    auth:
+      adminPassword: "adminconsolepwsharedidp"
     postgresql:
       nameOverride: "sharedidp-postgresql"
+      auth:
+        password: "dbpasswordsharedidp"
+        postgresPassword: "dbpasswordsharedidp"
       architecture: standalone
       primary:
         persistence:
           enabled: false
-    proxy: edge
-    initContainers:
-      - name: realm-import
-        image: docker.io/tractusx/umbrella-init-container:0.1.0-init
-        imagePullPolicy: IfNotPresent
-        command:
-          - sh
-        args:
-          - -c
-          - |
-            echo "Copying realms..."
-            cp -R /import/catenax-shared/realms/* /realms
-        volumeMounts:
-        - name: realms
-          mountPath: "/realms"
-      - name: theme-import
-        image: docker.io/tractusx/portal-iam:v3.0.0
-        imagePullPolicy: IfNotPresent
-        command:
-          - sh
-        args:
-          - -c
-          - |
-            echo "Copying themes-catenax-shared..."
-            cp -R /import/themes/catenax-shared/* /themes-catenax-shared
-            echo "Copying themes-catenax-shared-portal..."
-            cp -R /import/themes/catenax-shared-portal/* /themes-catenax-shared-portal
-        volumeMounts:
-        - name: themes-catenax-shared
-          mountPath: "/themes-catenax-shared"
-        - name: themes-catenax-shared-portal
-          mountPath: "/themes-catenax-shared-portal"
-      # uncomment the following line for tls
-      # - name: init-certs
-      #   image: docker.io/bitnami/keycloak:23.0.7-debian-12-r1
-      #   imagePullPolicy: IfNotPresent
-      #   command: ["/bin/bash"]
-      #   args:
-      #     - -ec
-      #     - |-
-      #       keytool -import -file "/certs/tls.crt" \
-      #               -keystore "/opt/bitnami/keycloak/certs/keycloak.truststore.jks" \
-      #               -storepass "${KEYCLOAK_SPI_TRUSTSTORE_PASSWORD}" \
-      #               -noprompt
-      #   env:
-      #     - name: KEYCLOAK_SPI_TRUSTSTORE_PASSWORD
-      #       value: "changeit"
-      #   volumeMounts:
-      #     - name: certificates
-      #       mountPath: /certs
-      #     - name: shared-certs
-      #       mountPath: "/opt/bitnami/keycloak/certs"
-    extraEnvVars:
-      - name: KEYCLOAK_EXTRA_ARGS
-        value: "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/realms -Dkeycloak.migration.strategy=IGNORE_EXISTING"
-      # uncomment the following line for tls
-      # - name: KEYCLOAK_SPI_TRUSTSTORE_FILE
-      #   value: "/opt/bitnami/keycloak/certs/keycloak.truststore.jks"
-      # - name: KEYCLOAK_SPI_TRUSTSTORE_PASSWORD
-      #   value: "changeit"
-    extraVolumes:
-      - name: realms
-        emptyDir: {}
-      - name: themes-catenax-shared
-        emptyDir: {}
-      - name: themes-catenax-shared-portal
-        emptyDir: {}
-      # uncomment the following line for tls
-      # - name: certificates
-      #   secret:
-      #     secretName: root-secret
-      #     defaultMode: 420
-      # - name: shared-certs
-      #   emptyDir: {}
-    extraVolumeMounts:
-      - name: realms
-        mountPath: "/realms"
-      - name: themes-catenax-shared
-        mountPath: "/opt/bitnami/keycloak/themes/catenax-shared"
-      - name: themes-catenax-shared-portal
-        mountPath: "/opt/bitnami/keycloak/themes/catenax-shared-portal"
-      # uncomment the following line for tls
-      # - name: certificates
-      #   mountPath: /certs
-      # - name: shared-certs
-      #   mountPath: "/opt/bitnami/keycloak/certs"
     ingress:
       enabled: true
       ingressClassName: "nginx"
@@ -494,29 +588,102 @@ sharedidp:
         nginx.ingress.kubernetes.io/proxy-buffers-number: "20"
         nginx.ingress.kubernetes.io/use-regex: "true"
       tls: false
-  secrets:
-    postgresql:
-      auth:
-        existingSecret:
-          postgrespassword: "dbpasswordsharedidp"
-          password: "dbpasswordsharedidp"
-          replicationPassword: "dbpasswordsharedidp"
-    auth:
-      existingSecret:
-        # -- Password for the admin username 'admin'. Secret-key 'admin-password'.
-        adminpassword: "adminconsolepwsharedidp"
+    # uncomment the following line for tls
+    # initContainers:
+    #   - name: init-certs
+    #     image: docker.io/bitnami/keycloak:25.0.6-debian-12-r0
+    #     imagePullPolicy: IfNotPresent
+    #     command: ["/bin/bash"]
+    #     args:
+    #       - -ec
+    #       - |-
+    #         keytool -import -file "/certs/tls.crt" \
+    #                 -keystore "/opt/bitnami/keycloak/certs/keycloak.truststore.jks" \
+    #                 -storepass "${KEYCLOAK_SPI_TRUSTSTORE_PASSWORD}" \
+    #                 -noprompt
+    #     env:
+    #       - name: KEYCLOAK_SPI_TRUSTSTORE_PASSWORD
+    #         value: "changeit"
+    #     volumeMounts:
+    #       - name: certificates
+    #         mountPath: /certs
+    #       - name: shared-certs
+    #         mountPath: "/opt/bitnami/keycloak/certs"
+    # extraEnvVars:
+    #   - name: KEYCLOAK_SPI_TRUSTSTORE_FILE
+    #     value: "/opt/bitnami/keycloak/certs/keycloak.truststore.jks"
+    #   - name: KEYCLOAK_SPI_TRUSTSTORE_PASSWORD
+    #     value: "changeit"
+    # extraVolumes:
+    #   - name: certificates
+    #     secret:
+    #       secretName: root-secret
+    #       defaultMode: 420
+    #   - name: shared-certs
+    #     emptyDir: {}
+    # extraVolumeMounts:
+    #   - name: certificates
+    #     mountPath: /certs
+    #   - name: shared-certs
+    #     mountPath: "/opt/bitnami/keycloak/certs"
+  realmSeeding:
+    realms:
+      cxOperator:
+        sslRequired: "none"
+        centralidp: "http://centralidp.tx.test"
+        initialUser:
+          username: "cx-operator@tx.test"
+          password: "tractusx-umbr3lla!"
+        mailing:
+          host: "smtp.tx.test"
+          port: "587"
+          username: "smtp-user"
+          password: ""
+          from: "smtp@tx.test"
+          replyTo: "smtp@tx.test"
+      master:
+        serviceAccounts:
+          provisioning:
+            clientSecret: "changeme"
+          saCxOperator:
+            clientSecret: "changeme"
 
 bpndiscovery:
   enabled: false
   enablePostgres: true
   bpndiscovery:
-    authentication: false
-    bpndiscoverEndpoint:
+    host: semantics.tx.test
+    ingress:
+      enabled: true
+      tls: false
+      urlPrefix: "/bpndiscovery"
+      className: "nginx"
+      annotations:
+        cert-manager.io/cluster-issuer: "my-ca-issuer"
+        nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+        nginx.ingress.kubernetes.io/use-regex: "true"
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+        nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+        nginx.ingress.kubernetes.io/x-forwarded-prefix: "/bpndiscovery"
+    authentication: true
+    idp:
+      issuerUri: "http://centralidp.tx.test/auth/realms/CX-Central"
+      publicClientId: "Cl22-CX-BPND"
+    bpndiscoveryEndpoint:
       allowedTypes: oen,wmi,passtype,manufacturerPartId
       description: Service to discover BPN for different kind of type numbers
       endpointAddress: /bpndiscovery
       documentation: /bpndiscovery/swagger-ui/index.html
       timeToLive: "31536000"
+    discoveryfinderClient:
+      baseUrl: "semantics.tx.test/discoveryfinder"
+      registration:
+        clientId: sa-cl22-01
+        clientSecret: "client-secret"
+        authorizationGrantType: changeme
+      schedulerCronFrequency: "0 0 */1 * * *"
+      provider:
+        tokenUri: "http://centralidp.tx.test/auth/realms/CX-Central/protocol/openid-connect/token"
     livenessProbe:
       initialDelaySeconds: 200
     readinessProbe:
@@ -582,18 +749,6 @@ selfdescription:
     secret:
       # -- JWK Set URI
       jwkSetUri: "http://centralidp.tx.test/auth/realms/CX-Central/protocol/openid-connect/certs"
-      # -- Custodian wallet client id
-      clientId: "sa-cl5-custodian-1"
-      # -- Custodian wallet client secret
-      clientSecret: "6pnnap7byS1TImL9Uj7g2psud9Fdq4tJ"
-      # -- Keycloak URL
-      authServerUrl: "http://centralidp.tx.test/auth"
-      # -- Keycloak Realm detail
-      realm: "CX-Central"
-      # -- Keycloak Resource detail
-      resource: "Cl5-CX-Custodian"
-      # -- Details for Custodian wallet URI
-      custodianWalletUri: ""
       # -- Details for Clearing House URI
       clearingHouseUri: ""
       # -- Details for Clearing House URL
@@ -621,23 +776,91 @@ selfdescription:
     #   # uncomment the following line for tls
     #   cert-manager.io/cluster-issuer: "my-ca-issuer"
 
-iatpmock:
+ssi-credential-issuer:
   enabled: false
-  nameOverride: mock-util-service
-  fullnameOverride: mock-util-service
-  # -- see README ## Precondition for IATP Mock
-  image:
-    # override with locally built image if needed, default "tractusx/iatp-mock"
-    repository: ""
-    # override tag if needed, default "testing"
-    tag: ""
+  portalBackendAddress: "http://portal-backend.tx.test"
+  walletAddress: "http://ssi-dim-wallet-stub.tx.test"
+  walletTokenAddress: "http://ssi-dim-wallet-stub.tx.test/oauth/token"
+  service:
+    swaggerEnabled: true
+    logging:
+      businessLogic: "Debug"
+      default: "Debug"
+    portal:
+      # -- Provide portal client-id from CX IAM centralidp.
+      # You must specify the technical user with the required roles for the interaction with the portal
+      clientId: "sa-cl24-01"
+      # -- Client-secret for portal client-id. Secret-key 'portal-client-secret'.
+      clientSecret: "changeme"
+    credential:
+      issuerDid: "did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003CRHK"
+      issuerBpn: "BPNL00000003CRHK"
+      statusListUrl: "http://ssi-dim-wallet-stub.tx.test/status-list/BPNL00000003CRHK/8a6c7486-1e1f-4555-bdd2-1a178182651e"
+      encryptionConfigIndex: 0
+      encryptionConfigs:
+        index0:
+          # EncryptionKey for wallet. Secret-key 'credential-encryption-key0'. Expected format is 256 bit (64 digits) hex.
+          encryptionKey: "deb8261ec7b89c344f1c5ef5a11606e305f14e0d231b1357d90ad0180c5081d3"
+  processesworker:
+    portal:
+      # -- Provide portal client-id from CX IAM centralidp.
+      # You must specify the technical user with the required roles for the interaction with the portal
+      clientId: "sa-cl24-01"
+      # -- Client-secret for portal client-id. Secret-key 'portal-client-secret'.
+      clientSecret: "changeme"
+    logging:
+      default: "Debug"
+    processIdentity:
+      identityId: ac1cf001-7fbc-1f2f-817f-bce058020006
+    wallet:
+      # -- Provide wallet client-id from CX IAM centralidp.
+      # You must specify the technical user with the required roles for the interaction with the managed-identity-wallet
+      clientId: "wallet-client-id"
+      # -- Client-secret for wallet client-id. Secret-key 'wallet-client-secret'.
+      clientSecret: ""
+  migrations:
+    logging:
+      default: "Debug"
+  credentialExpiry:
+    logging:
+      default: "Debug"
+  postgresql:
+    enabled: true
+    architecture: standalone
+    primary:
+      persistence:
+        enabled: false
+    auth:
+      # -- Password for the root username 'postgres'. Secret-key 'postgres-password'.
+      postgrespassword: "rootissuerpassword"
+      # -- Password for the non-root username 'issuer'. Secret-key 'password'.
+      password: "issuerpassword"
+
+  centralidp:
+    # -- Provide centralidp base address (CX IAM), without trailing '/auth'.
+    address: "http://centralidp.tx.test"
+    jwtBearerOptions:
+      requireHttpsMetadata: "false"
   ingress:
     enabled: true
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/use-regex: "true"
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: "8m"
+      nginx.ingress.kubernetes.io/cors-allow-origin: "http://*.tx.test"
+    # -- Ingress TLS configuration
+    tls: []
+      # - secretName: ""
+      #   hosts:
+      #     - ""
     hosts:
-      - host: iatpmock.tx.test
+      - host: "ssi-credential-issuer.tx.test"
         paths:
-          - path: /
-            pathType: ImplementationSpecific
+          - path: "/"
+            pathType: "Prefix"
+            backend:
+              port: 8080
 
 # Set up services for a business partner pool, golden record process
 # and a gate with which the Portal and the users can share business partner data
@@ -645,8 +868,8 @@ bpdm:
   enabled: false
   postgres:
     # We use the default name for BPDM postgres
-    fullnameOverride:
-    nameOverride: bpdm-postgres
+    fullnameOverride: &bpdmPostgresName "bpdm-postgres"
+    nameOverride:
     auth:
       # BPDM can't handle random initial passwords at the moment
       # so need to set a fixed one here and use it in the app configs later
@@ -682,14 +905,11 @@ bpdm:
         # App should take the x-forward-header-prefix into account for Swagger-UI and redirects to work correctly
         forward-headers-strategy: "FRAMEWORK"
       bpdm:
+        datasource:
+          host: *bpdmPostgresName
         bpn:
           # This Gate has no owner restriction as other companies can write into the Gate under their own tenant
           owner-bpn-l:
-        tasks:
-          creation:
-            fromSharingMember:
-              # Portal needs to set uploaded business partner data as ready to be shared by itself (disables setting it automatically as ready)
-              starts-as-ready: false
         security:
           # App's API is authenticated over Central-IDP
           auth-server-url: "http://centralidp.tx.test/auth"
@@ -703,11 +923,13 @@ bpdm:
         # We will reuse the general BPDM admin technical user to establish connection between the services
         client:
           pool:
+            base-url: http://business-partners.tx.test/pool
             registration:
-              client-id: *bpdmAdminClientId
+              client-id: "sa-cl7-cx-1"
           orchestrator:
+            base-url: http://business-partners.tx.test/orchestrator
             registration:
-              client-id: *bpdmAdminClientId
+              client-id: "sa-cl25-cx-3"
     applicationSecrets:
       spring:
         datasource:
@@ -717,10 +939,10 @@ bpdm:
         client:
           orchestrator:
             registration:
-              client-secret: *bpdmAdminClientSecret
+              client-secret: "changeme"
           pool:
             registration:
-              client-secret: *bpdmAdminClientSecret
+              client-secret: "changeme"
 
   # Configures the central business partner Pool
   bpdm-pool:
@@ -744,6 +966,8 @@ bpdm:
         # App should take the x-forward-header-prefix into account for Swagger-UI and redirects to work correctly
         forward-headers-strategy: "FRAMEWORK"
       bpdm:
+        datasource:
+          host: *bpdmPostgresName
         security:
           # App's API is authenticated over Central-IDP
           auth-server-url: "http://centralidp.tx.test/auth"
@@ -757,14 +981,15 @@ bpdm:
         # We will reuse the general BPDM admin technical user to establish connection between the services
         client:
           orchestrator:
+            base-url: http://business-partners.tx.test/orchestrator
             registration:
-              client-id: *bpdmAdminClientId
+              client-id: "sa-cl25-cx-2"
     applicationSecrets:
       bpdm:
         client:
           orchestrator:
             registration:
-              client-secret: *bpdmAdminClientSecret
+              client-secret: "changeme"
       spring:
         datasource:
           # Set the password of the postgres BPDM user here (Currently, BPDM can't deal with random initial passwords)
@@ -783,31 +1008,25 @@ bpdm:
           paths:
             - path: "/orchestrator(/|$)(.*)"
               pathType: "ImplementationSpecific"
+    postgres:
+      enabled: false
+      fullnameOverride: bpdm-postgres
     applicationConfig:
       server:
         # App should take the x-forward-header-prefix into account for Swagger-UI and redirects to work correctly
         forward-headers-strategy: "FRAMEWORK"
       bpdm:
+        datasource:
+          host: *bpdmPostgresName
         security:
           auth-server-url: "http://centralidp.tx.test/auth"
           realm: "CX-Central"
-          # The Central-IDP does not yet have dedicated Orchestrator permissions
-          # Therefore, we just reuse the permissions from the Pool for now
-          # Basically it is saying: If you would be able to write into the Pool directly,
-          # you are also able to create golden record tasks which eventually will write data into the Pool
-          # (We are stricter with the permissions now than we will have to be when using dedicated permissions)
-          client-id: "Cl7-CX-BPDM"
-          permissions:
-            createTask: "write_partner"
-            readTask: "write_partner"
-            reservation:
-              clean: "write_partner"
-              cleanAndSync: "write_partner"
-              poolSync: "write_partner"
-            result:
-              clean: "write_partner"
-              cleanAndSync: "write_partner"
-              poolSync: "write_partner"
+          client-id: "Cl25-CX-BPDM-Orchestrator"
+    applicationSecrets:
+      spring:
+        datasource:
+          # Set the password of the postgres BPDM user here (Currently, BPDM can't deal with random initial passwords)
+          password: *bpdmPostgresPassword
 
   # This installs a dummy cleaning service which performs rudimentary cleaning operations in order to realize the golden record process
   bpdm-cleaning-service-dummy:
@@ -818,46 +1037,47 @@ bpdm:
         # We reuse the general BPDM admin technical user to establish connection between the services
         client:
           orchestrator:
+            base-url: http://business-partners.tx.test/orchestrator
             provider:
               issuer-uri: "http://centralidp.tx.test/auth/realms/CX-Central"
             registration:
-              client-id: *bpdmAdminClientId
+              client-id: "sa-cl25-cx-1"
     applicationSecrets:
       bpdm:
         client:
           orchestrator:
             registration:
-              client-secret: *bpdmAdminClientSecret
+              client-secret: "changeme"
 
 dataconsumerOne:
   enabled: false
   seedTestdata: false
   nameOverride: dataconsumer-1
   secrets:
-    edc-miw-keycloak-secret: UbfW4CR1xH4OskkovqJ2JzcwnQIrG7oj
+    edc-wallet-secret: changeme
   tractusx-connector:
     nameOverride: dataconsumer-1-edc
     participant:
       id: BPNL00000003AZQP
     iatp:
-      id: did:web:mock-util-service/BPNL00000003AZQP
+      id: did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003AZQP
       trustedIssuers:
-        - did:web:mock-util-service/trusted-issuer
+        - did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003CRHK
       sts:
         dim:
-          url: http://mock-util-service/sts
+          url: http://ssi-dim-wallet-stub.tx.test/api/sts
         oauth:
-          token_url: http://centralidp.tx.test/auth/realms/CX-Central/protocol/openid-connect/token
+          token_url: http://ssi-dim-wallet-stub.tx.test/oauth/token
           client:
-            id: satest01
-            secret_alias: edc-miw-keycloak-secret
+            id: BPNL00000003AZQP
+            secret_alias: edc-wallet-secret
     controlplane:
       env:
-        TX_IAM_IATP_CREDENTIALSERVICE_URL: http://mock-util-service
+        TX_IAM_IATP_CREDENTIALSERVICE_URL: http://ssi-dim-wallet-stub.tx.test/api
         EDC_IAM_DID_WEB_USE_HTTPS: false
       bdrs:
         server:
-          url: http://bdrs-server.tx.test/api/directory
+          url: http://ssi-dim-wallet-stub.tx.test/api/v1/directory
       endpoints:
         management:
           authKey: TEST1
@@ -873,7 +1093,7 @@ dataconsumerOne:
             enabled: false
     dataplane:
       env:
-        TX_IAM_IATP_CREDENTIALSERVICE_URL: http://mock-util-service
+        TX_IAM_IATP_CREDENTIALSERVICE_URL: http://ssi-dim-wallet-stub.tx.test/api
         EDC_IAM_DID_WEB_USE_HTTPS: false
       ingresses:
         - enabled: true
@@ -926,30 +1146,30 @@ tx-data-provider:
   dataplaneUrl: http://{{ .Release.Name }}-dataprovider-edc-dataplane:8081
   nameOverride: dataprovider
   secrets:
-    edc-miw-keycloak-secret: pyFUZP2L9UCSVJUScHcN3ZEgy2PGyEpg
+    edc-wallet-secret: changeme
   tractusx-connector:
     nameOverride: dataprovider-edc
     participant:
       id: BPNL00000003AYRE
     iatp:
-      id: did:web:mock-util-service/BPNL00000003AYRE
+      id: did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003AYRE
       trustedIssuers:
-        - did:web:mock-util-service/trusted-issuer
+        - did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003CRHK
       sts:
         dim:
-          url: http://mock-util-service/sts
+          url: http://ssi-dim-wallet-stub.tx.test/api/sts
         oauth:
-          token_url: http://centralidp.tx.test/auth/realms/CX-Central/protocol/openid-connect/token
+          token_url: http://ssi-dim-wallet-stub.tx.test/oauth/token
           client:
-            id: satest02
-            secret_alias: edc-miw-keycloak-secret
+            id: BPNL00000003AYRE
+            secret_alias: edc-wallet-secret
     controlplane:
       env:
-        TX_IAM_IATP_CREDENTIALSERVICE_URL: http://mock-util-service
+        TX_IAM_IATP_CREDENTIALSERVICE_URL: http://ssi-dim-wallet-stub.tx.test/api
         EDC_IAM_DID_WEB_USE_HTTPS: false
       bdrs:
         server:
-          url: http://bdrs-server.tx.test/api/directory
+          url: http://ssi-dim-wallet-stub.tx.test/api/v1/directory
       endpoints:
         management:
           authKey: TEST2
@@ -965,7 +1185,7 @@ tx-data-provider:
             enabled: false
     dataplane:
       env:
-        TX_IAM_IATP_CREDENTIALSERVICE_URL: http://mock-util-service
+        TX_IAM_IATP_CREDENTIALSERVICE_URL: http://ssi-dim-wallet-stub.tx.test/api
         EDC_IAM_DID_WEB_USE_HTTPS: false
       ingresses:
         - enabled: true
@@ -1015,7 +1235,13 @@ tx-data-provider:
   simple-data-backend:
     nameOverride: dataprovider-submodelserver
     ingress:
-      enabled: false
+      enabled: true
+      className: "nginx"
+      hosts:
+        - host: "dataprovider-submodelserver.tx.test"
+          paths:
+            - path: "/"
+              pathType: "Prefix"
 
 semantic-hub:
   enabled: false
@@ -1032,6 +1258,19 @@ semantic-hub:
       initialDelaySeconds: 200
     readinessProbe:
       initialDelaySeconds: 200
+    host: semantics.tx.test
+    ingress:
+      enabled: true
+      tls: false
+      urlPrefix: "/hub"
+      className: "nginx"
+      annotations:
+        cert-manager.io/cluster-issuer: "my-ca-issuer"
+        nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+        nginx.ingress.kubernetes.io/use-regex: "true"
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+        nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+        nginx.ingress.kubernetes.io/x-forwarded-prefix: "/hub"
   graphdb:
     enabled: true
     image: jena-fuseki-docker:4.7.0
@@ -1044,30 +1283,30 @@ dataconsumerTwo:
   seedTestdata: false
   nameOverride: dataconsumer-2
   secrets:
-    edc-miw-keycloak-secret: tPwy4exxH1sXBRQouobSA2nNVaaPuwCs
+    edc-wallet-secret: changeme
   tractusx-connector:
     nameOverride: dataconsumer-2-edc
     participant:
       id: BPNL00000003AVTH
     iatp:
-      id: did:web:mock-util-service/BPNL00000003AVTH
+      id: did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003AVTH
       trustedIssuers:
-        - did:web:mock-util-service/trusted-issuer
+        - did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003CRHK
       sts:
         dim:
-          url: http://mock-util-service/sts
+          url: http://ssi-dim-wallet-stub.tx.test/api/sts
         oauth:
-          token_url: http://centralidp.tx.test/auth/realms/CX-Central/protocol/openid-connect/token
+          token_url: http://ssi-dim-wallet-stub.tx.test/oauth/token
           client:
-            id: satest03
-            secret_alias: edc-miw-keycloak-secret
+            id: BPNL00000003AVTH
+            secret_alias: edc-wallet-secret
     controlplane:
       env:
-        TX_IAM_IATP_CREDENTIALSERVICE_URL: http://mock-util-service
+        TX_IAM_IATP_CREDENTIALSERVICE_URL: http://ssi-dim-wallet-stub.tx.test/api
         EDC_IAM_DID_WEB_USE_HTTPS: false
       bdrs:
         server:
-          url: http://bdrs-server.tx.test/api/directory
+          url: http://ssi-dim-wallet-stub.tx.test/api/v1/directory
       endpoints:
         management:
           authKey: TEST3
@@ -1083,7 +1322,7 @@ dataconsumerTwo:
             enabled: false
     dataplane:
       env:
-        TX_IAM_IATP_CREDENTIALSERVICE_URL: http://mock-util-service
+        TX_IAM_IATP_CREDENTIALSERVICE_URL: http://ssi-dim-wallet-stub.tx.test/api
         EDC_IAM_DID_WEB_USE_HTTPS: false
       ingresses:
         - enabled: true
@@ -1130,7 +1369,7 @@ pgadmin4:
   enabled: false
   env:
     email: pgadmin4@txtest.org
-    password: tractusxpgdamin4
+    password: tractusxpgadmin4
   persistentVolume:
     enabled: false
   ingress:
@@ -1150,45 +1389,46 @@ bdrs-server-memory:
     url: "http://bdrs-server:8081"
     enabled: true
     bpnList:
+      - bpn: "BPNL00000003CRHK"
+        did: "did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003CRHK"
       - bpn: "BPNL00000003B3NX"
-        did: "did:web:mock-util-service/BPNL00000003B3NX"
+        did: "did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003B3NX"
       - bpn: "BPNL00000003CSGV"
-        did: "did:web:mock-util-service/BPNL00000003CSGV"
+        did: "did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003CSGV"
       - bpn: "BPNL00000003B6LU"
-        did: "did:web:mock-util-service/BPNL00000003B6LU"
+        did: "did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003B6LU"
       - bpn: "BPNL00000003AXS3"
-        did: "did:web:mock-util-service/BPNL00000003AXS3"
+        did: "did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003AXS3"
       - bpn: "BPNL00000003AZQP"
-        did: "did:web:mock-util-service/BPNL00000003AZQP"
+        did: "did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003AZQP"
       - bpn: "BPNL00000003AWSS"
-        did: "did:web:mock-util-service/BPNL00000003AWSS"
+        did: "did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003AWSS"
       - bpn: "BPNL00000003AYRE"
-        did: "did:web:mock-util-service/BPNL00000003AYRE"
+        did: "did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003AYRE"
       - bpn: "BPNL00000003AVTH"
-        did: "did:web:mock-util-service/BPNL00000003AVTH"
+        did: "did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003AVTH"
       - bpn: "BPNL00000000BJTL"
-        did: "did:web:mock-util-service/BPNL00000000BJTL"
+        did: "did:web:ssi-dim-wallet-stub.tx.test:BPNL00000000BJTL"
       - bpn: "BPNL00000003CML1"
-        did: "did:web:mock-util-service/BPNL00000003CML1"
+        did: "did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003CML1"
       - bpn: "BPNL00000003B2OM"
-        did: "did:web:mock-util-service/BPNL00000003B2OM"
+        did: "did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003B2OM"
       - bpn: "BPNL00000003B0Q0"
-        did: "did:web:mock-util-service/BPNL00000003B0Q0"
+        did: "did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003B0Q0"
       - bpn: "BPNL00000003B5MJ"
-        did: "did:web:mock-util-service/BPNL00000003B5MJ"
+        did: "did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003B5MJ"
       - bpn: "BPNS0000000008ZZ"
-        did: "did:web:mock-util-service/BPNS0000000008ZZ"
+        did: "did:web:ssi-dim-wallet-stub.tx.test:BPNS0000000008ZZ"
       - bpn: "BPNL00000003CNKC"
-        did: "did:web:mock-util-service/BPNL00000003CNKC"
+        did: "did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003CNKC"
       - bpn: "BPNS00000008BDFH"
-        did: "did:web:mock-util-service/BPNS00000008BDFH"
+        did: "did:web:ssi-dim-wallet-stub.tx.test:BPNS00000008BDFH"
 
   server:
     trustedIssuers:
-      - did:web:mock-util-service/trusted-issuer
+      - did:web:ssi-dim-wallet-stub.tx.test:BPNL00000003CRHK
     env:
       EDC_IAM_DID_WEB_USE_HTTPS: false
-
     endpoints:
       management:
         authKey: TEST
@@ -1201,6 +1441,51 @@ bdrs-server-memory:
         className: "nginx"
         tls:
           enabled: false
+
+ssi-dim-wallet-stub:
+  enabled: false
+  wallet:
+    replicaCount: 1
+    host: ssi-dim-wallet-stub.tx.test
+    nameSpace: "umbrella"
+    appName: "ssi-dim-wallet-stub"
+    configName: "ssi-dim-wallet-config"
+    serviceName: "ssi-dim-wallet-service"
+    secretName: "ssi-dim-wallet-secret"
+    ingressName: "ssi-dim-wallet-ingress"
+    seeding:
+      bpnList: "BPNL00000003AZQP,BPNL00000003AYRE"
+    ingress:
+      enabled: true
+      tls: false
+      urlPrefix: /
+      className: nginx
+      annotations: {}
+    swagger:
+      ui:
+        status: true
+      apiDoc:
+        status: true
+    logLevel: "debug"
+    environment: "default"
+    baseWalletBpn: "BPNL00000003CRHK"
+    didHost: "ssi-dim-wallet-stub.tx.test"
+    stubUrl: "http://ssi-dim-wallet-stub.tx.test"
+    statusListVcId: "8a6c7486-1e1f-4555-bdd2-1a178182651e"
+    tokenExpiryTime: "5"
+    portal:
+      waitTime: "60"
+      host: "http://portal-backend.tx.test"
+      clientId: "sa-cl2-05"
+      clientSecret: "changeme"
+    keycloak:
+      realm: "CX-Central"
+      authServerUrl: "http://centralidp.tx.test/auth"
+    service:
+      type: ClusterIP
+      port: 8080
+  keycloak:
+    enabled: false
 
 discovery-mock:
   enabled: false

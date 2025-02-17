@@ -44,26 +44,35 @@ sharedidp:
   #       persistence:
   #         enabled: true
 
+pgadmin4:
+  enabled: true
+  # -- uncomment the following for persistance
+  # persistentVolume:
+  #   enabled: true
+
+# Interfaces are disabled by default (other than IAM)
+
+# Set 'enabled' to true if onboarding is required
+bpdm:
+  enabled: false
+
+bdrs-server-memory:
+  enabled: false
+
+# Set 'enabled' to true if onboarding is required
+selfdescription:
+  enabled: false
+
 bpndiscovery:
   enabled: false
 
 discoveryfinder:
   enabled: false
 
-selfdescription:
-  enabled: true
-
-managed-identity-wallet:
-  enabled: true
-
-dataconsumer:
+# Set 'enabled' to true if onboarding is required
+ssi-credential-issuer:
   enabled: false
 
-tx-data-provider:
+# Set 'enabled' to true if onboarding is required
+ssi-dim-wallet-stub:
   enabled: false
-
-pgadmin4:
-  enabled: true
-  # -- uncomment the following for persistance
-  # persistentVolume:
-  #   enabled: true

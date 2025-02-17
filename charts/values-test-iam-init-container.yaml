@@ -18,35 +18,9 @@
 ###############################################################
 
 centralidp:
-  keycloak:
-    initContainers:
-      - name: import
-        image: kind-registry:5000/init-container:testing
-        imagePullPolicy: Always
-        command:
-          - sh
-        args:
-          - -c
-          - |
-            echo "Copying realms..."
-            cp -R /import/catenax-central/R2405/realms/* /realms
-        volumeMounts:
-        - name: realms
-          mountPath: "/realms"
-
-sharedidp:
-  keycloak:
-    initContainers:
-      - name: import
-        image: kind-registry:5000/init-container:testing
-        imagePullPolicy: Always
-        command:
-          - sh
-        args:
-          - -c
-          - |
-            echo "Copying realms..."
-            cp -R /import/catenax-shared/realms/* /realms
-        volumeMounts:
-        - name: realms
-          mountPath: "/realms"
+  enabled: true
+  realmSeeding:
+    initContainer:
+      image:
+        name: kind-registry:5000/init-container:testing
+        pullPolicy: Always

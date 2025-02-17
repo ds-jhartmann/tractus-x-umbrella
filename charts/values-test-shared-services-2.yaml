@@ -17,6 +17,9 @@
 # SPDX-License-Identifier: Apache-2.0
 ###############################################################
 
+bpdm:
+  enabled: true
+
 bpndiscovery:
   enabled: true
 
@@ -24,4 +27,7 @@ discoveryfinder:
   enabled: true
 
 semantic-hub:
+  enabled: true
+
+ssi-credential-issuer:
   enabled: true
