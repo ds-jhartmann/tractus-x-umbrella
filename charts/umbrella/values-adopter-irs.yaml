@@ -105,3 +105,8 @@ tx-data-provider:
           requests:
             memory: 256Mi
             cpu: 50m
+
+ssi-dim-wallet-stub:
+  enabled: true
+  wallet:
+    nameSpace: "e2e-testing"
