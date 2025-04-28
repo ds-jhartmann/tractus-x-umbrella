@@ -1,5 +1,96 @@
 apiVersion: v1
 entries:
+  data-persistence-layer-bundle:
+  - apiVersion: v2
+    created: "2025-04-28T14:19:57.263595497Z"
+    dependencies:
+    - condition: simple-data-backend.enabled
+      name: simple-data-backend
+      repository: https://eclipse-tractusx.github.io/charts/dev
+      version: 0.1.0
+    description: 'Helm chart for Capability Bundle: Data Persistence Layer  The Data
+      Persistence Layer Bundle provides a simple data backend for the Catena-X ecosystem. '
+    digest: b3ab3b8210520a93606e9641d06b6ad3ed187dab35829800a5065f4629f3f782
+    home: https://github.com/eclipse-tractusx/tractus-x-umbrella/tree/main/charts/data-persistence-layer-bundle
+    name: data-persistence-layer-bundle
+    sources:
+    - https://github.com/eclipse-tractusx/tractus-x-umbrella/tree/main/charts/data-persistence-layer-bundle
+    type: application
+    urls:
+    - https://github.com/ds-jhartmann/tractus-x-umbrella/releases/download/data-persistence-layer-bundle-1.0.0/data-persistence-layer-bundle-1.0.0.tgz
+    version: 1.0.0
+  dataspace-connector-bundle:
+  - apiVersion: v2
+    created: "2025-04-28T14:19:57.454885338Z"
+    dependencies:
+    - condition: tractusx-connector.enabled
+      name: tractusx-connector
+      repository: https://eclipse-tractusx.github.io/charts/dev
+      version: 0.9.0
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 15.2.1
+    - condition: vault.enabled
+      name: vault
+      repository: https://helm.releases.hashicorp.com
+      version: 0.27.0
+    description: 'Helm chart for Capability Bundle: Dataspace Connector '
+    digest: 7874d20f919ecc78fe399708ca5a3e736352afc83e2eefd813986f03ee8d77aa
+    home: https://github.com/eclipse-tractusx/tractus-x-umbrella/tree/main/charts/dataspace-connector-bundle
+    name: dataspace-connector-bundle
+    sources:
+    - https://github.com/eclipse-tractusx/tractus-x-umbrella/tree/main/charts/dataspace-connector-bundle
+    type: application
+    urls:
+    - https://github.com/ds-jhartmann/tractus-x-umbrella/releases/download/dataspace-connector-bundle-1.0.1/dataspace-connector-bundle-1.0.1.tgz
+    version: 1.0.1
+  digital-twin-bundle:
+  - apiVersion: v2
+    created: "2025-04-28T14:19:57.609493397Z"
+    dependencies:
+    - condition: digital-twin-registry.enabled
+      name: digital-twin-registry
+      repository: https://eclipse-tractusx.github.io/charts/dev
+      version: 0.7.0
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 15.2.1
+    description: 'Helm chart for Capability Bundle: Digital Twin  The Digital Twin
+      Bundle provides a complete solution for managing digital twins in the Catena-X
+      ecosystem. It includes the Digital Twin Registry and its required dependencies.  For
+      more information about the Digital Twin Registry check this documentation [Digital
+      Twin Registry](https://github.com/eclipse-tractusx/sldt-digital-twin-registry/blob/main/charts/registry/README.md). '
+    digest: 271a7c9ff0ef4e7cb333667af18168d9ca5b541e12bbde43d4a5765337c50fcd
+    home: https://github.com/eclipse-tractusx/tractus-x-umbrella/tree/main/charts/digital-twin-bundle
+    name: digital-twin-bundle
+    sources:
+    - https://github.com/eclipse-tractusx/tractus-x-umbrella/tree/main/charts/digital-twin-bundle
+    type: application
+    urls:
+    - https://github.com/ds-jhartmann/tractus-x-umbrella/releases/download/digital-twin-bundle-1.0.1/digital-twin-bundle-1.0.1.tgz
+    version: 1.0.1
+  identity-and-trust-bundle:
+  - apiVersion: v2
+    created: "2025-04-28T14:19:57.735216976Z"
+    dependencies:
+    - condition: ssi-dim-wallet-stub.enabled
+      name: ssi-dim-wallet-stub
+      repository: https://eclipse-tractusx.github.io/charts/dev
+      version: 0.1.8
+    description: 'Helm chart for Capability Bundle: Identity and Trust  The Identity
+      & Trust Bundle provides identity management and authentication services for
+      the Catena-X ecosystem.  '
+    digest: 9f148c332b74c9c303843b3b82c951ca5f74da8759a20ff33f97198aab9fe9f5
+    home: https://github.com/eclipse-tractusx/tractus-x-umbrella/tree/main/charts/identity-and-trust-bundle
+    name: identity-and-trust-bundle
+    sources:
+    - https://github.com/eclipse-tractusx/tractus-x-umbrella/tree/main/charts/identity-and-trust-bundle
+    type: application
+    urls:
+    - https://github.com/ds-jhartmann/tractus-x-umbrella/releases/download/identity-and-trust-bundle-1.0.1/identity-and-trust-bundle-1.0.1.tgz
+    version: 1.0.1
   simple-data-backend:
   - apiVersion: v2
     appVersion: 0.0.1
@@ -591,4 +682,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/e2e-testing/releases/download/umbrella-0.2.1/umbrella-0.2.1.tgz
     version: 0.2.1
-generated: "2025-04-28T14:16:23.970443757Z"
+generated: "2025-04-28T14:19:58.193172156Z"
